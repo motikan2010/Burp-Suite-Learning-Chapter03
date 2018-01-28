@@ -1,8 +1,32 @@
 package burp;
 
-public class BurpExtender implements IBurpExtender {
+import com.motikan2010.SampleTab;
 
-    public void registerExtenderCallbacks(IBurpExtenderCallbacks iBurpExtenderCallbacks) {
-        
+import javax.swing.*;
+import java.awt.*;
+
+public class BurpExtender implements IBurpExtender, ITab {
+
+    private static final String EXTENSION_NAME = "Sample Tab Extender";
+
+    private SampleTab sampleTab;
+
+    public void registerExtenderCallbacks(final IBurpExtenderCallbacks iBurpExtenderCallbacks) {
+        iBurpExtenderCallbacks.setExtensionName(EXTENSION_NAME);
+
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                sampleTab = SampleTab.getInstance();
+                iBurpExtenderCallbacks.addSuiteTab(BurpExtender.this);
+            }
+        });
+    }
+
+    public String getTabCaption() {
+        return EXTENSION_NAME;
+    }
+
+    public Component getUiComponent() {
+        return sampleTab;
     }
 }

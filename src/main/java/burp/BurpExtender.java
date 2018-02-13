@@ -5,6 +5,7 @@ import com.motikan2010.SampleTab;
 import javax.swing.*;
 import java.awt.*;
 
+
 public class BurpExtender implements IBurpExtender, ITab {
 
     private static final String EXTENSION_NAME = "Sample Tab Extender";
@@ -14,12 +15,10 @@ public class BurpExtender implements IBurpExtender, ITab {
     public void registerExtenderCallbacks(final IBurpExtenderCallbacks iBurpExtenderCallbacks) {
         iBurpExtenderCallbacks.setExtensionName(EXTENSION_NAME);
 
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                sampleTab = SampleTab.getInstance();
-                sampleTab.render();
-                iBurpExtenderCallbacks.addSuiteTab(BurpExtender.this);
-            }
+        SwingUtilities.invokeLater(() -> {
+            sampleTab = SampleTab.getInstance();
+            sampleTab.render(SampleTab.BOX_LAYOUT);
+            iBurpExtenderCallbacks.addSuiteTab(BurpExtender.this);
         });
     }
 

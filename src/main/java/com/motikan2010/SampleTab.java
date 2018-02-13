@@ -1,7 +1,5 @@
 package com.motikan2010;
 
-import javafx.scene.layout.Pane;
-
 import javax.swing.*;
 import java.awt.*;
 

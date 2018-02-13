@@ -17,7 +17,7 @@ public class BurpExtender implements IBurpExtender, ITab {
 
         SwingUtilities.invokeLater(() -> {
             sampleTab = SampleTab.getInstance();
-            sampleTab.render(SampleTab.BOX_LAYOUT);
+            sampleTab.render(SampleTab.FLOW_LAYOUT);
             iBurpExtenderCallbacks.addSuiteTab(BurpExtender.this);
         });
     }

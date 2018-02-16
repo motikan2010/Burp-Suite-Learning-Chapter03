@@ -8,7 +8,6 @@ import java.util.List;
 public class RequestResponseUtils {
 
     private static RequestResponseUtils utils;
-    private static IBurpExtenderCallbacks iBurpExtenderCallbacks;
     private static IExtensionHelpers iExtensionHelpers;
 
     private static final String NEW_LINE = System.lineSeparator();
@@ -17,9 +16,8 @@ public class RequestResponseUtils {
         utils = null;
     }
 
-    public static RequestResponseUtils getInstance(IBurpExtenderCallbacks callbacks) {
-        iBurpExtenderCallbacks = callbacks;
-        iExtensionHelpers = callbacks.getHelpers();
+    public static RequestResponseUtils getInstance() {
+        iExtensionHelpers = BurpExtender.getHelpers();
         if (utils == null) {
             utils = new RequestResponseUtils();
         }

@@ -1,49 +1,31 @@
 package com.motikan2010;
 
-import burp.IHttpRequestResponse;
+import burp.BurpExtender;
+import com.motikan2010.entity.RequestResponseEntity;
 
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 import java.util.List;
 
 public class RequestTableModel extends AbstractTableModel {
 
-    private final List<IHttpRequestResponse> iHttpRequestResponseList;
+    private final List<RequestResponseEntity> requestResponseEntityList = new ArrayList<>();;
 
-    private static Object[][] tableData;
+    private static final String[] COLUMN_NAMES = {"Host", "Method", "Path", "Status"};
 
-    private static final String[] COLUMN_NAMES = {"Host", "Method", "URL", "Status"};
-
-    private static final int TABLE_ROW_COUNT = 10;
     private static final int TABLE_COLUMN_COUNT = 4;
 
     public static final int HOST_COLUMN_INDEX   = 0;
     public static final int METHOD_COLUMN_INDEX = 1;
-    public static final int URL_COLUMN_INDEX    = 2;
+    public static final int PATH_COLUMN_INDEX   = 2;
     public static final int STATUS_COLUMN_INDEX = 3;
 
-    public RequestTableModel() {
-        iHttpRequestResponseList = new ArrayList<>();
-        tableData = new Object[TABLE_ROW_COUNT][TABLE_COLUMN_COUNT];
-        for(int i = 0; i < TABLE_ROW_COUNT; i++) {
-            tableData[i][HOST_COLUMN_INDEX]   = "";
-            tableData[i][METHOD_COLUMN_INDEX] = "";
-            tableData[i][URL_COLUMN_INDEX]    = "";
-            tableData[i][STATUS_COLUMN_INDEX] = "";
-        }
+    public void addRequestResponse(RequestResponseEntity requestResponse) {
+        requestResponseEntityList.add(requestResponse);
     }
 
-    public void addRequestResponse(IHttpRequestResponse requestResponse) {
-        iHttpRequestResponseList.add(requestResponse);
-    }
-
-    public IHttpRequestResponse getRequestResponse(int rowIndex) {
-        return iHttpRequestResponseList.get(rowIndex);
-    }
-
-    public List<IHttpRequestResponse> getRequestResponseList() {
-        return iHttpRequestResponseList;
+    public RequestResponseEntity getRequestResponse(int rowIndex) {
+        return requestResponseEntityList.get(rowIndex);
     }
 
     public int getColumnCount() {
@@ -51,16 +33,28 @@ public class RequestTableModel extends AbstractTableModel {
     }
 
     public int getRowCount() {
-        return TABLE_ROW_COUNT;
-        // return iHttpRequestResponseList.size();
+        return 10;
     }
 
     public int getCount() {
-        return iHttpRequestResponseList.size();
+        return requestResponseEntityList.size();
     }
 
     public Object getValueAt(int rowIndex, int columnIndex) {
-        return tableData[rowIndex][columnIndex];
+        RequestResponseEntity requestResponseEntity = requestResponseEntityList.get(rowIndex);
+
+        switch (columnIndex) {
+            case 0:
+                return requestResponseEntity.getHost();
+            case 1:
+                return requestResponseEntity.getMethod();
+            case 2:
+                return requestResponseEntity.getPath();
+            case 3:
+                return requestResponseEntity.getResponseStatus();
+            default:
+                return "";
+        }
     }
 
     @Override
@@ -76,11 +70,5 @@ public class RequestTableModel extends AbstractTableModel {
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         return true;
-    }
-
-    @Override
-    public void setValueAt(Object value, int rowIndex, int columnIndex) {
-        tableData[rowIndex][columnIndex] = value;
-        fireTableDataChanged();
     }
 }

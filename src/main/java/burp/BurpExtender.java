@@ -12,7 +12,8 @@ import java.util.List;
 
 public class BurpExtender implements IBurpExtender, IContextMenuFactory, ITab {
 
-    private IBurpExtenderCallbacks iBurpExtenderCallbacks;
+    private static IBurpExtenderCallbacks callbacks;
+    private static IExtensionHelpers helpers;
 
     private static final String EXTENSION_NAME = "Sample Tab Extender";
 
@@ -20,18 +21,19 @@ public class BurpExtender implements IBurpExtender, IContextMenuFactory, ITab {
     private SampleTab sampleTab;
     private RequestResponseUtils requestResponseUtils;
 
-    public void registerExtenderCallbacks(final IBurpExtenderCallbacks callbacks) {
-        callbacks.setExtensionName(EXTENSION_NAME);
-        this.iBurpExtenderCallbacks = callbacks;
-        this.requestResponseUtils = RequestResponseUtils.getInstance(callbacks);
+    public void registerExtenderCallbacks(final IBurpExtenderCallbacks c) {
+        c.setExtensionName(EXTENSION_NAME);
+        callbacks = c;
+        helpers = c.getHelpers();
+        this.requestResponseUtils = RequestResponseUtils.getInstance();
 
         SwingUtilities.invokeLater(() -> {
-            sampleTab = new SampleTab(callbacks, requestResponseUtils);
+            sampleTab = new SampleTab(requestResponseUtils);
             sampleTab.render();
-            callbacks.addSuiteTab(BurpExtender.this);
+            c.addSuiteTab(BurpExtender.this);
         });
 
-        callbacks.registerContextMenuFactory(this);
+        c.registerContextMenuFactory(this);
     }
 
     public String getTabCaption() {
@@ -40,6 +42,14 @@ public class BurpExtender implements IBurpExtender, IContextMenuFactory, ITab {
 
     public Component getUiComponent() {
         return sampleTab;
+    }
+
+    public static IBurpExtenderCallbacks getCallbacks() {
+        return callbacks;
+    }
+
+    public static IExtensionHelpers getHelpers() {
+        return helpers;
     }
 
     @Override
@@ -52,7 +62,7 @@ public class BurpExtender implements IBurpExtender, IContextMenuFactory, ITab {
         List<JMenuItem> jMenuItemList = new LinkedList<>();
 
         JMenuItem requestJMenuItem = new JMenuItem("Save Request");
-        requestJMenuItem.addMouseListener(new RequestContextMenu(this.iBurpExtenderCallbacks, httpRequestResponseArray, sampleTab));
+        requestJMenuItem.addMouseListener(new RequestContextMenu(httpRequestResponseArray, sampleTab));
         jMenuItemList.add(requestJMenuItem);
 
         return jMenuItemList;

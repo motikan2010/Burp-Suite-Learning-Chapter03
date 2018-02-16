@@ -1,7 +1,8 @@
 package com.motikan2010;
 
 
-import burp.IHttpRequestResponse;
+import burp.BurpExtender;
+import com.motikan2010.entity.RequestResponseEntity;
 
 public class RequestTableManager {
 
@@ -19,11 +20,11 @@ public class RequestTableManager {
         return this.model;
     }
 
-    public synchronized IHttpRequestResponse getRequestResponse(int rowIndex) {
+    public synchronized RequestResponseEntity getRequestResponse(int rowIndex) {
         return this.model.getRequestResponse(rowIndex);
     }
 
-    public synchronized void addRequestResponse(IHttpRequestResponse requestResponse) {
+    public void addRequestResponse(RequestResponseEntity requestResponse) {
         this.model.addRequestResponse(requestResponse);
     }
 }

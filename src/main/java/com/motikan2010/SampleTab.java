@@ -2,6 +2,7 @@ package com.motikan2010;
 
 
 import burp.*;
+import com.motikan2010.entity.RequestResponseEntity;
 import com.motikan2010.util.RequestResponseUtils;
 
 import javax.swing.*;
@@ -12,8 +13,8 @@ import java.awt.event.MouseEvent;
 
 public class SampleTab extends JPanel {
 
-    private RequestTableModel requestTableModel;
-    private RequestTableManager requestTableManager;
+    private final RequestTableModel requestTableModel;
+    private final RequestTableManager requestTableManager;
 
     private JTextArea requestTextArea;
     private JTextArea responseTextArea;
@@ -22,9 +23,9 @@ public class SampleTab extends JPanel {
     private IExtensionHelpers iExtensionHelpers;
     private RequestResponseUtils requestResponseUtils;
 
-    public SampleTab(IBurpExtenderCallbacks callbacks, RequestResponseUtils utils) {
-        iBurpExtenderCallbacks = callbacks;
-        iExtensionHelpers = callbacks.getHelpers();
+    public SampleTab(RequestResponseUtils utils) {
+        iBurpExtenderCallbacks = BurpExtender.getCallbacks();
+        iExtensionHelpers = BurpExtender.getHelpers();
         requestResponseUtils = utils;
 
         requestTableModel = new RequestTableModel();
@@ -40,7 +41,6 @@ public class SampleTab extends JPanel {
         panel1.setLayout(new GridLayout(1, 1));
         panel2.setLayout(new GridLayout(2, 1));
 
-        requestTableModel = new RequestTableModel();
         JTable jTable = new JTable(requestTableModel);
 
         // Click table row
@@ -57,15 +57,14 @@ public class SampleTab extends JPanel {
         jTable.getColumnModel().getColumn(RequestTableModel.HOST_COLUMN_INDEX).setMaxWidth(250);
 
         // Method Column
-        jTable.getColumnModel().getColumn(RequestTableModel.METHOD_COLUMN_INDEX).setWidth(30);
-        jTable.getColumnModel().getColumn(RequestTableModel.METHOD_COLUMN_INDEX).setMaxWidth(40);
+        jTable.getColumnModel().getColumn(RequestTableModel.METHOD_COLUMN_INDEX).setWidth(300);
 
         // Url Column
-        jTable.getColumnModel().getColumn(RequestTableModel.URL_COLUMN_INDEX).setMaxWidth(50);
-        jTable.getColumnModel().getColumn(RequestTableModel.URL_COLUMN_INDEX).setResizable(false);
+        jTable.getColumnModel().getColumn(RequestTableModel.PATH_COLUMN_INDEX).setMaxWidth(300);
 
         // Status Column
         jTable.getColumnModel().getColumn(RequestTableModel.STATUS_COLUMN_INDEX).setPreferredWidth(150);
+        jTable.getColumnModel().getColumn(RequestTableModel.STATUS_COLUMN_INDEX).setResizable(false);
 
         JScrollPane requestScrollPane = new JScrollPane(jTable);
 
@@ -84,20 +83,14 @@ public class SampleTab extends JPanel {
     }
 
     public void selectRequest(int rowNum) {
-        IHttpRequestResponse iHttpRequestResponse = requestTableManager.getRequestResponse(rowNum);
-        String request = requestResponseUtils.showRequest(iHttpRequestResponse);
-        String response  = requestResponseUtils.showResponse(iHttpRequestResponse);
+        RequestResponseEntity requestResponseEntity = requestTableManager.getRequestResponse(rowNum);
+        String request = requestResponseUtils.showRequest(requestResponseEntity.getRequestResponse());
+        String response  = requestResponseUtils.showResponse(requestResponseEntity.getRequestResponse());
         requestTextArea.setText(request);
         responseTextArea.setText(response);
     }
 
-    public void keepRequest(IRequestInfo iRequestInfo, IHttpRequestResponse iHttpRequestResponse) {
-        Integer rowIndex = requestTableManager.getRowCount();
-        requestTableModel.setValueAt(iRequestInfo.getUrl().getHost(), rowIndex, RequestTableModel.HOST_COLUMN_INDEX);
-        requestTableModel.setValueAt(iRequestInfo.getMethod(), rowIndex, RequestTableModel.METHOD_COLUMN_INDEX);
-        requestTableModel.setValueAt(iRequestInfo.getUrl().getPath(), rowIndex, RequestTableModel.URL_COLUMN_INDEX);
-        requestTableModel.setValueAt(iExtensionHelpers.analyzeResponse(iHttpRequestResponse.getResponse()).getStatusCode(),
-                rowIndex, RequestTableModel.STATUS_COLUMN_INDEX);
-        requestTableManager.addRequestResponse(iHttpRequestResponse);
+    public void keepRequest(RequestResponseEntity requestResponseEntity) {
+        requestTableManager.addRequestResponse(requestResponseEntity);
     }
 }

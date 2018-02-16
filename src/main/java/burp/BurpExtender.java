@@ -1,6 +1,6 @@
 package burp;
 
-import com.motikan2010.RequestTable;
+import com.motikan2010.RequestTableModel;
 import com.motikan2010.SampleTab;
 import com.motikan2010.RequestContextMenu;
 import com.motikan2010.util.RequestResponseUtils;
@@ -16,7 +16,7 @@ public class BurpExtender implements IBurpExtender, IContextMenuFactory, ITab {
 
     private static final String EXTENSION_NAME = "Sample Tab Extender";
 
-    private RequestTable requestTable;
+    private RequestTableModel requestTableModel;
     private SampleTab sampleTab;
     private RequestResponseUtils requestResponseUtils;
 
@@ -26,8 +26,7 @@ public class BurpExtender implements IBurpExtender, IContextMenuFactory, ITab {
         this.requestResponseUtils = RequestResponseUtils.getInstance(callbacks);
 
         SwingUtilities.invokeLater(() -> {
-            requestTable = new RequestTable();
-            sampleTab = SampleTab.getInstance(callbacks, requestResponseUtils);
+            sampleTab = new SampleTab(callbacks, requestResponseUtils);
             sampleTab.render();
             callbacks.addSuiteTab(BurpExtender.this);
         });

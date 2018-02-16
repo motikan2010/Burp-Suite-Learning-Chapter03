@@ -1,14 +1,15 @@
 package com.motikan2010;
 
 import burp.IHttpRequestResponse;
-import burp.IRequestInfo;
 
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
+import java.util.ArrayList;
 import java.util.List;
 
-public class RequestTable extends DefaultTableModel implements TableModelListener {
+public class RequestTableModel extends AbstractTableModel {
+
+    private final List<IHttpRequestResponse> iHttpRequestResponseList;
 
     private static Object[][] tableData;
 
@@ -22,7 +23,8 @@ public class RequestTable extends DefaultTableModel implements TableModelListene
     public static final int URL_COLUMN_INDEX    = 2;
     public static final int STATUS_COLUMN_INDEX = 3;
 
-    public RequestTable() {
+    public RequestTableModel() {
+        iHttpRequestResponseList = new ArrayList<>();
         tableData = new Object[TABLE_ROW_COUNT][TABLE_COLUMN_COUNT];
         for(int i = 0; i < TABLE_ROW_COUNT; i++) {
             tableData[i][HOST_COLUMN_INDEX]   = "";
@@ -30,11 +32,18 @@ public class RequestTable extends DefaultTableModel implements TableModelListene
             tableData[i][URL_COLUMN_INDEX]    = "";
             tableData[i][STATUS_COLUMN_INDEX] = "";
         }
-        addTableModelListener(this);
     }
 
-    public Object[][] getTabledata() {
-        return this.tableData;
+    public void addRequestResponse(IHttpRequestResponse requestResponse) {
+        iHttpRequestResponseList.add(requestResponse);
+    }
+
+    public IHttpRequestResponse getRequestResponse(int rowIndex) {
+        return iHttpRequestResponseList.get(rowIndex);
+    }
+
+    public List<IHttpRequestResponse> getRequestResponseList() {
+        return iHttpRequestResponseList;
     }
 
     public int getColumnCount() {
@@ -43,6 +52,11 @@ public class RequestTable extends DefaultTableModel implements TableModelListene
 
     public int getRowCount() {
         return TABLE_ROW_COUNT;
+        // return iHttpRequestResponseList.size();
+    }
+
+    public int getCount() {
+        return iHttpRequestResponseList.size();
     }
 
     public Object getValueAt(int rowIndex, int columnIndex) {
@@ -68,10 +82,5 @@ public class RequestTable extends DefaultTableModel implements TableModelListene
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
         tableData[rowIndex][columnIndex] = value;
         fireTableDataChanged();
-    }
-
-    @Override
-    public void tableChanged(TableModelEvent e) {
-
     }
 }

@@ -9,35 +9,29 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.LinkedList;
-import java.util.List;
 
 public class SampleTab extends JPanel {
 
-    private static SampleTab panel;
+    private RequestTableModel requestTableModel;
+    private RequestTableManager requestTableManager;
 
-    private RequestTable requestTable;
     private JTextArea requestTextArea;
     private JTextArea responseTextArea;
 
-    private static IBurpExtenderCallbacks iBurpExtenderCallbacks;
-    private static IExtensionHelpers iExtensionHelpers;
-    private static RequestResponseUtils requestResponseUtils;
+    private IBurpExtenderCallbacks iBurpExtenderCallbacks;
+    private IExtensionHelpers iExtensionHelpers;
+    private RequestResponseUtils requestResponseUtils;
 
-    private List<IHttpRequestResponse> iHttpRequestResponseList;
-
-    public static SampleTab getInstance(IBurpExtenderCallbacks callbacks, RequestResponseUtils utils) {
+    public SampleTab(IBurpExtenderCallbacks callbacks, RequestResponseUtils utils) {
         iBurpExtenderCallbacks = callbacks;
         iExtensionHelpers = callbacks.getHelpers();
         requestResponseUtils = utils;
-        if (panel == null) {
-            panel = new SampleTab();
-        }
-        return panel;
+
+        requestTableModel = new RequestTableModel();
+        requestTableManager = new RequestTableManager(requestTableModel);
     }
 
     public void render() {
-        iHttpRequestResponseList = new LinkedList<>();
 
         setLayout(new GridLayout(1, 2));
 
@@ -46,8 +40,8 @@ public class SampleTab extends JPanel {
         panel1.setLayout(new GridLayout(1, 1));
         panel2.setLayout(new GridLayout(2, 1));
 
-        requestTable = new RequestTable();
-        JTable jTable = new JTable(requestTable);
+        requestTableModel = new RequestTableModel();
+        JTable jTable = new JTable(requestTableModel);
 
         // Click table row
         jTable.addMouseListener(new MouseAdapter() {
@@ -58,20 +52,20 @@ public class SampleTab extends JPanel {
         });
 
         // Host Column
-        jTable.getColumnModel().getColumn(RequestTable.HOST_COLUMN_INDEX).setPreferredWidth(150);
-        jTable.getColumnModel().getColumn(RequestTable.HOST_COLUMN_INDEX).setMinWidth(100);
-        jTable.getColumnModel().getColumn(RequestTable.HOST_COLUMN_INDEX).setMaxWidth(250);
+        jTable.getColumnModel().getColumn(RequestTableModel.HOST_COLUMN_INDEX).setPreferredWidth(150);
+        jTable.getColumnModel().getColumn(RequestTableModel.HOST_COLUMN_INDEX).setMinWidth(100);
+        jTable.getColumnModel().getColumn(RequestTableModel.HOST_COLUMN_INDEX).setMaxWidth(250);
 
         // Method Column
-        jTable.getColumnModel().getColumn(RequestTable.METHOD_COLUMN_INDEX).setWidth(30);
-        jTable.getColumnModel().getColumn(RequestTable.METHOD_COLUMN_INDEX).setMaxWidth(40);
+        jTable.getColumnModel().getColumn(RequestTableModel.METHOD_COLUMN_INDEX).setWidth(30);
+        jTable.getColumnModel().getColumn(RequestTableModel.METHOD_COLUMN_INDEX).setMaxWidth(40);
 
         // Url Column
-        jTable.getColumnModel().getColumn(RequestTable.URL_COLUMN_INDEX).setMaxWidth(50);
-        jTable.getColumnModel().getColumn(RequestTable.URL_COLUMN_INDEX).setResizable(false);
+        jTable.getColumnModel().getColumn(RequestTableModel.URL_COLUMN_INDEX).setMaxWidth(50);
+        jTable.getColumnModel().getColumn(RequestTableModel.URL_COLUMN_INDEX).setResizable(false);
 
         // Status Column
-        jTable.getColumnModel().getColumn(RequestTable.STATUS_COLUMN_INDEX).setPreferredWidth(150);
+        jTable.getColumnModel().getColumn(RequestTableModel.STATUS_COLUMN_INDEX).setPreferredWidth(150);
 
         JScrollPane requestScrollPane = new JScrollPane(jTable);
 
@@ -90,7 +84,7 @@ public class SampleTab extends JPanel {
     }
 
     public void selectRequest(int rowNum) {
-        IHttpRequestResponse iHttpRequestResponse = iHttpRequestResponseList.get(rowNum);
+        IHttpRequestResponse iHttpRequestResponse = requestTableManager.getRequestResponse(rowNum);
         String request = requestResponseUtils.showRequest(iHttpRequestResponse);
         String response  = requestResponseUtils.showResponse(iHttpRequestResponse);
         requestTextArea.setText(request);
@@ -98,12 +92,12 @@ public class SampleTab extends JPanel {
     }
 
     public void keepRequest(IRequestInfo iRequestInfo, IHttpRequestResponse iHttpRequestResponse) {
-        Integer rowIndex = iHttpRequestResponseList.size();
-        requestTable.setValueAt(iRequestInfo.getUrl().getHost(), rowIndex, RequestTable.HOST_COLUMN_INDEX);
-        requestTable.setValueAt(iRequestInfo.getMethod(), rowIndex, RequestTable.METHOD_COLUMN_INDEX);
-        requestTable.setValueAt(iRequestInfo.getUrl().getPath(), rowIndex, RequestTable.URL_COLUMN_INDEX);
-        requestTable.setValueAt(iExtensionHelpers.analyzeResponse(iHttpRequestResponse.getResponse()).getStatusCode(),
-                rowIndex, RequestTable.STATUS_COLUMN_INDEX);
-        iHttpRequestResponseList.add(iHttpRequestResponse);
+        Integer rowIndex = requestTableManager.getRowCount();
+        requestTableModel.setValueAt(iRequestInfo.getUrl().getHost(), rowIndex, RequestTableModel.HOST_COLUMN_INDEX);
+        requestTableModel.setValueAt(iRequestInfo.getMethod(), rowIndex, RequestTableModel.METHOD_COLUMN_INDEX);
+        requestTableModel.setValueAt(iRequestInfo.getUrl().getPath(), rowIndex, RequestTableModel.URL_COLUMN_INDEX);
+        requestTableModel.setValueAt(iExtensionHelpers.analyzeResponse(iHttpRequestResponse.getResponse()).getStatusCode(),
+                rowIndex, RequestTableModel.STATUS_COLUMN_INDEX);
+        requestTableManager.addRequestResponse(iHttpRequestResponse);
     }
 }

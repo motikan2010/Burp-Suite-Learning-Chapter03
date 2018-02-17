@@ -8,11 +8,11 @@ public class SampleTab extends JPanel {
     private static SampleTab panel;
 
     public static final int FLOW_LAYOUT = 0;
-    public static final int GRID_LAYOUT = 0;
-    public static final int GRID_BAG_LAYOUT = 0;
-    public static final int BORDER_LAYOUT = 0;
-    public static final int BOX_LAYOUT = 0;
-    public static final int PANEL_LAYOUT = 0;
+    public static final int GRID_LAYOUT = 1;
+    public static final int GRID_BAG_LAYOUT = 2;
+    public static final int BORDER_LAYOUT = 3;
+    public static final int BOX_LAYOUT = 4;
+    public static final int PANEL_LAYOUT = 5;
 
     public static SampleTab getInstance() {
         if (panel == null) {

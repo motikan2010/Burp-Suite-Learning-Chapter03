@@ -1,7 +1,6 @@
 package com.motikan2010;
 
 
-import burp.*;
 import com.motikan2010.entity.RequestResponseEntity;
 import com.motikan2010.util.RequestResponseUtils;
 
@@ -19,13 +18,9 @@ public class SampleTab extends JPanel {
     private JTextArea requestTextArea;
     private JTextArea responseTextArea;
 
-    private IBurpExtenderCallbacks iBurpExtenderCallbacks;
-    private IExtensionHelpers iExtensionHelpers;
     private RequestResponseUtils requestResponseUtils;
 
     public SampleTab(RequestResponseUtils utils) {
-        iBurpExtenderCallbacks = BurpExtender.getCallbacks();
-        iExtensionHelpers = BurpExtender.getHelpers();
         requestResponseUtils = utils;
 
         requestTableModel = new RequestTableModel();
@@ -42,6 +37,8 @@ public class SampleTab extends JPanel {
         panel2.setLayout(new GridLayout(2, 1));
 
         JTable jTable = new JTable(requestTableModel);
+        jTable.setShowVerticalLines(true);
+        jTable.setShowHorizontalLines(false);
 
         // Click table row
         jTable.addMouseListener(new MouseAdapter() {
@@ -57,21 +54,25 @@ public class SampleTab extends JPanel {
         jTable.getColumnModel().getColumn(RequestTableModel.HOST_COLUMN_INDEX).setMaxWidth(250);
 
         // Method Column
-        jTable.getColumnModel().getColumn(RequestTableModel.METHOD_COLUMN_INDEX).setWidth(300);
+        jTable.getColumnModel().getColumn(RequestTableModel.METHOD_COLUMN_INDEX).setMinWidth(50);
+        jTable.getColumnModel().getColumn(RequestTableModel.METHOD_COLUMN_INDEX).setMaxWidth(60);
 
-        // Url Column
+        // Path Column
+        jTable.getColumnModel().getColumn(RequestTableModel.PATH_COLUMN_INDEX).setMinWidth(200);
         jTable.getColumnModel().getColumn(RequestTableModel.PATH_COLUMN_INDEX).setMaxWidth(300);
 
         // Status Column
-        jTable.getColumnModel().getColumn(RequestTableModel.STATUS_COLUMN_INDEX).setPreferredWidth(150);
-        jTable.getColumnModel().getColumn(RequestTableModel.STATUS_COLUMN_INDEX).setResizable(false);
+        jTable.getColumnModel().getColumn(RequestTableModel.STATUS_COLUMN_INDEX).setMinWidth(50);
+        jTable.getColumnModel().getColumn(RequestTableModel.STATUS_COLUMN_INDEX).setMaxWidth(60);
 
         JScrollPane requestScrollPane = new JScrollPane(jTable);
 
         requestTextArea = new JTextArea();
+        requestTextArea.setLineWrap(true);
         JScrollPane requestTextAreaPane = new JScrollPane(requestTextArea);
 
         responseTextArea = new JTextArea();
+        responseTextArea.setLineWrap(true);
         JScrollPane responseTextAreaPane = new JScrollPane(responseTextArea);
 
         panel1.add(requestScrollPane);
@@ -82,6 +83,10 @@ public class SampleTab extends JPanel {
         add(panel2);
     }
 
+    /**
+     * テーブルの行を選択
+     * @param rowNum 行番号
+     */
     public void selectRequest(int rowNum) {
         RequestResponseEntity requestResponseEntity = requestTableManager.getRequestResponse(rowNum);
         String request = requestResponseUtils.showRequest(requestResponseEntity.getRequestResponse());
@@ -90,6 +95,11 @@ public class SampleTab extends JPanel {
         responseTextArea.setText(response);
     }
 
+    /**
+     * リクエスト&レスポンスを保存
+     *
+     * @param requestResponseEntity 保存対象のリクエスト&レスポンスのエンティティ
+     */
     public void keepRequest(RequestResponseEntity requestResponseEntity) {
         requestTableManager.addRequestResponse(requestResponseEntity);
     }

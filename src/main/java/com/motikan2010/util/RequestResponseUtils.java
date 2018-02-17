@@ -73,8 +73,8 @@ public class RequestResponseUtils {
     /**
      * ヘッダーリストを文字列に変換
      *
-     * @param headers
-     * @return
+     * @param headers ヘッダーのリスト
+     * @return ヘッダーのテキスト
      */
     private static String createHeaderRaw(List<String> headers) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -89,8 +89,8 @@ public class RequestResponseUtils {
     /**
      * ボディのバイト配列を文字列に変換
      *
-     * @param bodyBytes
-     * @return
+     * @param bodyBytes ヘッダーのバイト配列
+     * @return ボディのテキスト
      */
     private static String createBodyRaw(byte[] bodyBytes) {
         String response = "";

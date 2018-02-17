@@ -1,6 +1,5 @@
 package com.motikan2010;
 
-import burp.BurpExtender;
 import com.motikan2010.entity.RequestResponseEntity;
 
 import javax.swing.table.AbstractTableModel;
@@ -22,6 +21,8 @@ public class RequestTableModel extends AbstractTableModel {
 
     public void addRequestResponse(RequestResponseEntity requestResponse) {
         requestResponseEntityList.add(requestResponse);
+        // https://docs.oracle.com/javase/8/docs/api/javax/swing/table/AbstractTableModel.html#fireTableRowsInserted-int-int-
+        fireTableRowsInserted(0, requestResponseEntityList.size() - 1);
     }
 
     public RequestResponseEntity getRequestResponse(int rowIndex) {
@@ -33,10 +34,6 @@ public class RequestTableModel extends AbstractTableModel {
     }
 
     public int getRowCount() {
-        return 10;
-    }
-
-    public int getCount() {
         return requestResponseEntityList.size();
     }
 

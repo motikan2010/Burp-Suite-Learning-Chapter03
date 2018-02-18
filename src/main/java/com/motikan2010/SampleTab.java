@@ -65,12 +65,15 @@ public class SampleTab extends JPanel {
         jTable.getColumnModel().getColumn(RequestTableModel.STATUS_COLUMN_INDEX).setMinWidth(50);
         jTable.getColumnModel().getColumn(RequestTableModel.STATUS_COLUMN_INDEX).setMaxWidth(60);
 
+        // スクロールパネルにテーブルを追加します
         JScrollPane requestScrollPane = new JScrollPane(jTable);
 
+        // リクエスト内容を表示するテキストエリア
         requestTextArea = new JTextArea();
         requestTextArea.setLineWrap(true);
         JScrollPane requestTextAreaPane = new JScrollPane(requestTextArea);
 
+        // レスポンス内容を表示するテキストエリア
         responseTextArea = new JTextArea();
         responseTextArea.setLineWrap(true);
         JScrollPane responseTextAreaPane = new JScrollPane(responseTextArea);

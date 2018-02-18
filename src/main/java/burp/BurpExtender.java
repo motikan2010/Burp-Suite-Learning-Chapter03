@@ -1,6 +1,5 @@
 package burp;
 
-import com.motikan2010.RequestTableModel;
 import com.motikan2010.SampleTab;
 import com.motikan2010.RequestContextMenu;
 import com.motikan2010.util.RequestResponseUtils;
@@ -17,7 +16,6 @@ public class BurpExtender implements IBurpExtender, IContextMenuFactory, ITab {
 
     private static final String EXTENSION_NAME = "Sample Tab Extender";
 
-    private RequestTableModel requestTableModel;
     private SampleTab sampleTab;
     private RequestResponseUtils requestResponseUtils;
 

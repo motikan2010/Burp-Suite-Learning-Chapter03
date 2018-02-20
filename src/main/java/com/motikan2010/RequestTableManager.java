@@ -1,6 +1,10 @@
 package com.motikan2010;
 
+import burp.IHttpRequestResponse;
 import com.motikan2010.entity.RequestResponseEntity;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class RequestTableManager {
 
@@ -8,6 +12,13 @@ public class RequestTableManager {
 
     public RequestTableManager(RequestTableModel requestTableModel) {
         this.model = requestTableModel;
+    }
+
+    public List<IHttpRequestResponse> getRequestResponseList() {
+        List<RequestResponseEntity> requestResponseEntityList = this.model.getRequestResponseEntityList();
+        return requestResponseEntityList.stream()
+                .filter(RequestResponseEntity::isEnabled) // 列項目「Enable」にチェックが付いている行を対象
+                .map(RequestResponseEntity::getRequestResponse).collect(Collectors.toList());
     }
 
     /**

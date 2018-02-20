@@ -24,6 +24,10 @@ public class RequestResponseUtils {
         return utils;
     }
 
+    public String getNewLine() {
+        return NEW_LINE;
+    }
+
     /**
      * リクエスト情報を取得
      *

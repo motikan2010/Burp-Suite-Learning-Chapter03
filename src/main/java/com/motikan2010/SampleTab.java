@@ -1,6 +1,8 @@
 package com.motikan2010;
 
 
+import burp.BurpExtender;
+import burp.IHttpRequestResponse;
 import com.motikan2010.entity.RequestResponseEntity;
 import com.motikan2010.util.RequestResponseUtils;
 
@@ -9,6 +11,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SampleTab extends JPanel {
 
@@ -16,7 +20,7 @@ public class SampleTab extends JPanel {
     private final RequestTableManager requestTableManager;
 
     private JTextArea requestTextArea;
-    private JTextArea responseTextArea;
+    private JTextArea requestResponseTextArea;
 
     private RequestResponseUtils requestResponseUtils;
 
@@ -31,10 +35,13 @@ public class SampleTab extends JPanel {
 
         setLayout(new GridLayout(1, 2));
 
-        Panel panel1 = new Panel();
-        Panel panel2 = new Panel();
-        panel1.setLayout(new GridLayout(1, 1));
-        panel2.setLayout(new GridLayout(2, 1));
+        JPanel panel1 = new JPanel();
+        JPanel panel2 = new JPanel();
+        GridLayout leftLayout = new GridLayout(2, 1);
+        panel1.setLayout(leftLayout);
+
+        GridBagLayout rightLayout = new GridBagLayout();
+        panel2.setLayout(rightLayout);
 
         JTable jTable = new JTable(requestTableModel);
         jTable.setShowVerticalLines(true);
@@ -65,6 +72,10 @@ public class SampleTab extends JPanel {
         jTable.getColumnModel().getColumn(RequestTableModel.STATUS_COLUMN_INDEX).setMinWidth(50);
         jTable.getColumnModel().getColumn(RequestTableModel.STATUS_COLUMN_INDEX).setMaxWidth(60);
 
+        // Status Column
+        jTable.getColumnModel().getColumn(RequestTableModel.ENABLE_COLUMN_INDEX).setMinWidth(50);
+        jTable.getColumnModel().getColumn(RequestTableModel.ENABLE_COLUMN_INDEX).setMaxWidth(60);
+
         // スクロールパネルにテーブルを追加します
         JScrollPane requestScrollPane = new JScrollPane(jTable);
 
@@ -73,14 +84,57 @@ public class SampleTab extends JPanel {
         requestTextArea.setLineWrap(true);
         JScrollPane requestTextAreaPane = new JScrollPane(requestTextArea);
 
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0.5;
+        gbc.fill = GridBagConstraints.NONE;
+        JButton sendButton = new JButton("送信");
+        rightLayout.setConstraints(sendButton, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.weightx = 0.5;
+        gbc.fill = GridBagConstraints.NONE;
+        JButton clearButton = new JButton("クリア");
+        rightLayout.setConstraints(clearButton, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
         // レスポンス内容を表示するテキストエリア
-        responseTextArea = new JTextArea();
-        responseTextArea.setLineWrap(true);
-        JScrollPane responseTextAreaPane = new JScrollPane(responseTextArea);
+        requestResponseTextArea = new JTextArea();
+        requestResponseTextArea.setLineWrap(true);
+        JScrollPane requestResponseTextAreaPane = new JScrollPane(requestResponseTextArea);
+        rightLayout.setConstraints(requestResponseTextAreaPane, gbc);
+
+        // ☆ 「送信」ボタン押下時に発火
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        sendButton.addActionListener(e -> executor.submit(() ->
+            requestTableManager.getRequestResponseList().stream().forEach(request -> {
+                // リクエストをテキストエリアに追加
+                requestResponseTextArea.append(requestResponseUtils.showRequest(request) + requestResponseUtils.getNewLine());
+
+                IHttpRequestResponse response = BurpExtender.getCallbacks().makeHttpRequest(request.getHttpService(), request.getRequest());
+                // レスポンスをテキストエリアに追加
+                requestResponseTextArea.append(requestResponseUtils.showResponse(response) + requestResponseUtils.getNewLine()
+                        + requestResponseUtils.getNewLine() + requestResponseUtils.getNewLine());
+            })
+        ));
+
+        // 「クリア」ボタン押下時に発火
+        // リクエスト&レスポンステキストエリアを空文字で初期化
+        clearButton.addActionListener(e -> requestResponseTextArea.setText(""));
 
         panel1.add(requestScrollPane);
-        panel2.add(requestTextAreaPane);
-        panel2.add(responseTextAreaPane);
+        panel1.add(requestTextAreaPane);
+        panel2.add(sendButton);
+        panel2.add(clearButton);
+        panel2.add(requestResponseTextAreaPane);
 
         add(panel1);
         add(panel2);
@@ -93,9 +147,7 @@ public class SampleTab extends JPanel {
     public void selectRequest(int rowNum) {
         RequestResponseEntity requestResponseEntity = requestTableManager.getRequestResponse(rowNum);
         String request = requestResponseUtils.showRequest(requestResponseEntity.getRequestResponse());
-        String response  = requestResponseUtils.showResponse(requestResponseEntity.getRequestResponse());
         requestTextArea.setText(request);
-        responseTextArea.setText(response);
     }
 
     /**

@@ -14,6 +14,7 @@ public class RequestResponseEntity {
         this.url = iRequestInfo.getUrl();
         this.method = iRequestInfo.getMethod();
         this.responseStatus = iResponseInfo.getStatusCode();
+        this.isEnabled = true;
     }
 
     private IHttpRequestResponse requestResponse;
@@ -23,6 +24,8 @@ public class RequestResponseEntity {
     private String method;
 
     private int responseStatus;
+
+    private boolean isEnabled;
 
     public IHttpRequestResponse getRequestResponse() {
         return requestResponse;
@@ -42,5 +45,13 @@ public class RequestResponseEntity {
 
     public int getResponseStatus() {
         return this.responseStatus;
+    }
+
+    public boolean isEnabled() {
+        return this.isEnabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.isEnabled = enabled;
     }
 }

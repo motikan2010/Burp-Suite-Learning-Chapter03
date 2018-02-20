@@ -8,16 +8,17 @@ import java.util.List;
 
 public class RequestTableModel extends AbstractTableModel {
 
-    private final List<RequestResponseEntity> requestResponseEntityList = new ArrayList<>();;
+    private final List<RequestResponseEntity> requestResponseEntityList = new ArrayList<>();
 
-    private static final String[] COLUMN_NAMES = {"Host", "Method", "Path", "Status"};
+    private static final String[] COLUMN_NAMES = {"Host", "Method", "Path", "Status", "Enable"};
 
-    private static final int TABLE_COLUMN_COUNT = 4;
+    private static final int TABLE_COLUMN_COUNT = 5;
 
     public static final int HOST_COLUMN_INDEX   = 0;
     public static final int METHOD_COLUMN_INDEX = 1;
     public static final int PATH_COLUMN_INDEX   = 2;
     public static final int STATUS_COLUMN_INDEX = 3;
+    public static final int ENABLE_COLUMN_INDEX = 4;
 
     public void addRequestResponse(RequestResponseEntity requestResponse) {
         requestResponseEntityList.add(requestResponse);
@@ -28,6 +29,10 @@ public class RequestTableModel extends AbstractTableModel {
 
     public RequestResponseEntity getRequestResponse(int rowIndex) {
         return requestResponseEntityList.get(rowIndex);
+    }
+
+    public List<RequestResponseEntity> getRequestResponseEntityList() {
+        return this.requestResponseEntityList;
     }
 
     public int getColumnCount() {
@@ -50,6 +55,8 @@ public class RequestTableModel extends AbstractTableModel {
                 return requestResponseEntity.getPath();
             case 3:
                 return requestResponseEntity.getResponseStatus();
+            case 4:
+                return requestResponseEntity.isEnabled();
             default:
                 return "";
         }
@@ -67,6 +74,17 @@ public class RequestTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return true;
+        return (columnIndex == ENABLE_COLUMN_INDEX);
+    }
+
+    @Override
+    public void setValueAt(Object value, int rowIndex, int columnIndex) {
+        RequestResponseEntity requestResponseEntity = requestResponseEntityList.get(rowIndex);
+
+        switch (columnIndex) {
+            case 4:
+                requestResponseEntity.setEnabled((boolean) value);
+        }
+        requestResponseEntityList.set(rowIndex, requestResponseEntity);
     }
 }

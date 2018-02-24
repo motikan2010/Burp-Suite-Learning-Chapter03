@@ -25,12 +25,14 @@ public class BurpExtender implements IBurpExtender, IContextMenuFactory, ITab {
         helpers = c.getHelpers();
         this.requestResponseUtils = RequestResponseUtils.getInstance();
 
+        // タブの追加
         SwingUtilities.invokeLater(() -> {
             sampleTab = new SampleTab(requestResponseUtils);
             sampleTab.render();
             c.addSuiteTab(BurpExtender.this);
         });
 
+        // コンテキストメニューの登録
         c.registerContextMenuFactory(this);
     }
 
@@ -50,6 +52,11 @@ public class BurpExtender implements IBurpExtender, IContextMenuFactory, ITab {
         return helpers;
     }
 
+    /**
+     * コンテキストメニューの作成
+     * @param iContextMenuInvocation
+     * @return
+     */
     @Override
     public List<JMenuItem> createMenuItems(IContextMenuInvocation iContextMenuInvocation) {
         IHttpRequestResponse[] httpRequestResponseArray = iContextMenuInvocation.getSelectedMessages();

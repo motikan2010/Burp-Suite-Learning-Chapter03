@@ -35,13 +35,13 @@ public class SampleTab extends JPanel {
 
         setLayout(new GridLayout(1, 2));
 
-        JPanel panel1 = new JPanel();
-        JPanel panel2 = new JPanel();
+        JPanel leftJPanel = new JPanel();
+        JPanel rightJPanel = new JPanel();
         GridLayout leftLayout = new GridLayout(2, 1);
-        panel1.setLayout(leftLayout);
+        leftJPanel.setLayout(leftLayout);
 
         GridBagLayout rightLayout = new GridBagLayout();
-        panel2.setLayout(rightLayout);
+        rightJPanel.setLayout(rightLayout);
 
         JTable jTable = new JTable(requestTableModel);
         jTable.setShowVerticalLines(true);
@@ -58,7 +58,6 @@ public class SampleTab extends JPanel {
         // Host Column
         jTable.getColumnModel().getColumn(RequestTableModel.HOST_COLUMN_INDEX).setPreferredWidth(150);
         jTable.getColumnModel().getColumn(RequestTableModel.HOST_COLUMN_INDEX).setMinWidth(100);
-        jTable.getColumnModel().getColumn(RequestTableModel.HOST_COLUMN_INDEX).setMaxWidth(250);
 
         // Method Column
         jTable.getColumnModel().getColumn(RequestTableModel.METHOD_COLUMN_INDEX).setMinWidth(50);
@@ -66,7 +65,6 @@ public class SampleTab extends JPanel {
 
         // Path Column
         jTable.getColumnModel().getColumn(RequestTableModel.PATH_COLUMN_INDEX).setMinWidth(200);
-        jTable.getColumnModel().getColumn(RequestTableModel.PATH_COLUMN_INDEX).setMaxWidth(300);
 
         // Status Column
         jTable.getColumnModel().getColumn(RequestTableModel.STATUS_COLUMN_INDEX).setMinWidth(50);
@@ -112,32 +110,40 @@ public class SampleTab extends JPanel {
         JScrollPane requestResponseTextAreaPane = new JScrollPane(requestResponseTextArea);
         rightLayout.setConstraints(requestResponseTextAreaPane, gbc);
 
-        // ☆ 「送信」ボタン押下時に発火
+        // ◆「送信」ボタン押下時に発火
         ExecutorService executor = Executors.newSingleThreadExecutor();
         sendButton.addActionListener(e -> executor.submit(() ->
-            requestTableManager.getRequestResponseList().stream().forEach(request -> {
-                // リクエストをテキストエリアに追加
-                requestResponseTextArea.append(requestResponseUtils.showRequest(request) + requestResponseUtils.getNewLine());
+                // requestResponseEntityList(テーブル内のデータ)に格納されているリクエストを一行ずつ送信
+                requestTableManager.getRequestResponseList().stream().forEach(iHttpRequestResponse -> {
+                    // リクエストをテキストエリアに追加
+                    requestResponseTextArea.append(requestResponseUtils.showRequest(iHttpRequestResponse) // リクエスト情報
+                            + requestResponseUtils.getNewLine() + requestResponseUtils.getNewLine());
 
-                IHttpRequestResponse response = BurpExtender.getCallbacks().makeHttpRequest(request.getHttpService(), request.getRequest());
-                // レスポンスをテキストエリアに追加
-                requestResponseTextArea.append(requestResponseUtils.showResponse(response) + requestResponseUtils.getNewLine()
-                        + requestResponseUtils.getNewLine() + requestResponseUtils.getNewLine());
-            })
+                    // リクエストの送信
+                    IHttpRequestResponse response = BurpExtender.getCallbacks().makeHttpRequest(iHttpRequestResponse.getHttpService(), iHttpRequestResponse.getRequest());
+
+                    // レスポンスをテキストエリアに追加
+                    requestResponseTextArea.append(requestResponseUtils.showResponse(response) // レスポンス情報
+                            + requestResponseUtils.getNewLine() + requestResponseUtils.getNewLine() + requestResponseUtils.getNewLine()); //
+                })
         ));
 
         // 「クリア」ボタン押下時に発火
         // リクエスト&レスポンステキストエリアを空文字で初期化
         clearButton.addActionListener(e -> requestResponseTextArea.setText(""));
 
-        panel1.add(requestScrollPane);
-        panel1.add(requestTextAreaPane);
-        panel2.add(sendButton);
-        panel2.add(clearButton);
-        panel2.add(requestResponseTextAreaPane);
+        leftJPanel.add(requestScrollPane);
+        leftJPanel.add(requestTextAreaPane);
+        rightJPanel.add(sendButton);
+        rightJPanel.add(clearButton);
+        rightJPanel.add(requestResponseTextAreaPane);
 
-        add(panel1);
-        add(panel2);
+        add(leftJPanel);
+        add(rightJPanel);
+    }
+
+    private void sendRequest() {
+
     }
 
     /**

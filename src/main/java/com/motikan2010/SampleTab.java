@@ -142,10 +142,6 @@ public class SampleTab extends JPanel {
         add(rightJPanel);
     }
 
-    private void sendRequest() {
-
-    }
-
     /**
      * テーブルの行を選択
      * @param rowNum 行番号
